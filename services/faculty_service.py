@@ -89,3 +89,149 @@ def create_faculty(faculty_data):
             'success': False,
             'message': f'Database error: {str(e)}'
         }
+
+def get_all_faculties():
+    """
+    Get all faculties from the database
+    
+    Returns:
+        dict: Result with success status, message, and faculties list
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT faculty_id, name, email, phone, department, designation 
+            FROM faculty 
+            ORDER BY faculty_id
+        """)
+        
+        results = cursor.fetchall()
+        
+        faculties = []
+        for row in results:
+            faculty_dict = {
+                'faculty_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'department': row[4],
+                'designation': row[5]
+            }
+            faculties.append(faculty_dict)
+        
+        cursor.close()
+        conn.close()
+        
+        return {
+            'success': True,
+            'message': 'Faculties retrieved successfully',
+            'faculties': faculties
+        }
+        
+    except Exception as e:
+        return {
+            'success': False,
+            'message': f'Database error: {str(e)}'
+        }
+
+def get_faculty_by_id(faculty_id):
+    """
+    Get faculty by ID
+    
+    Args:
+        faculty_id (str): Faculty ID to search for
+    
+    Returns:
+        dict: Result with success status, message, and faculty data
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT faculty_id, name, email, phone, department, designation 
+            FROM faculty 
+            WHERE faculty_id = %s
+        """, (faculty_id,))
+        
+        result = cursor.fetchone()
+        
+        if not result:
+            cursor.close()
+            conn.close()
+            return {
+                'success': False,
+                'message': 'Faculty not found'
+            }
+        
+        faculty_dict = {
+            'faculty_id': result[0],
+            'name': result[1],
+            'email': result[2],
+            'phone': result[3],
+            'department': result[4],
+            'designation': result[5]
+        }
+        
+        cursor.close()
+        conn.close()
+        
+        return {
+            'success': True,
+            'message': 'Faculty retrieved successfully',
+            'faculty': faculty_dict
+        }
+        
+    except Exception as e:
+        return {
+            'success': False,
+            'message': f'Database error: {str(e)}'
+        }
+
+def delete_faculty(faculty_id):
+    """
+    Delete faculty by ID
+    
+    Args:
+        faculty_id (str): Faculty ID to delete
+    
+    Returns:
+        dict: Result with success status and message
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if faculty exists
+        cursor.execute("SELECT faculty_id FROM faculty WHERE faculty_id = %s", (faculty_id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return {
+                'success': False,
+                'message': 'Faculty not found'
+            }
+        
+        # Delete faculty
+        cursor.execute("DELETE FROM faculty WHERE faculty_id = %s", (faculty_id,))
+        conn.commit()
+        
+        cursor.close()
+        conn.close()
+        
+        return {
+            'success': True,
+            'message': 'Faculty deleted successfully'
+        }
+        
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+            cursor.close()
+            conn.close()
+        return {
+            'success': False,
+            'message': f'Database error: {str(e)}'
+        }
