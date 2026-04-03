@@ -3,6 +3,7 @@ from flask_cors import CORS
 from routes.student_routes import student_bp
 from routes.faculty_routes import faculty_bp
 from routes.courses_routes import courses_bp
+from routes.rooms_routes import rooms_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -11,6 +12,7 @@ CORS(app)
 app.register_blueprint(student_bp)
 app.register_blueprint(faculty_bp, url_prefix='/api')
 app.register_blueprint(courses_bp)
+app.register_blueprint(rooms_bp)
 
 @app.route('/')
 def home():
@@ -35,6 +37,12 @@ def home():
                 "get_all": "GET /courses/",
                 "get_by_code": "GET /courses/<course_code>",
                 "delete": "DELETE /courses/<course_code>"
+            },
+            "rooms": {
+                "create": "POST /rooms/create",
+                "get_all": "GET /rooms/",
+                "get_by_id": "GET /rooms/<room_id>",
+                "delete": "DELETE /rooms/<room_id>"
             }
         }
         
