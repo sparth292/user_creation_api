@@ -27,10 +27,10 @@ class StudentService:
             insert_query = """
             INSERT INTO students (
                 student_id, password_hash, name, email, phone, 
-                date_of_birth, address, department, year, roll_number, sgpa
+                date_of_birth, address, department, year, roll_number, sgpa, lab_batch
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-            ) RETURNING student_id, name, email, phone, department, year, roll_number, sgpa
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+            ) RETURNING student_id, name, email, phone, department, year, roll_number, sgpa, lab_batch
             """
             
             # Convert year to enum value if needed
@@ -51,7 +51,8 @@ class StudentService:
                 student_data.get('department'),
                 year_value,  # Use enum value
                 student_data.get('roll_number'),
-                student_data.get('sgpa')
+                student_data.get('sgpa'),
+                student_data.get('lab_batch')
             )
             
             cursor.execute(insert_query, values)
@@ -63,7 +64,7 @@ class StudentService:
             conn.close()
             
             # Return created student data
-            columns = ['student_id', 'name', 'email', 'phone', 'department', 'year', 'roll_number', 'sgpa']
+            columns = ['student_id', 'name', 'email', 'phone', 'department', 'year', 'roll_number', 'sgpa', 'lab_batch']
             created_student = dict(zip(columns, result))
             
             return {
@@ -98,7 +99,7 @@ class StudentService:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             cursor.execute("""
-                SELECT student_id, name, email, phone, department, year, roll_number, sgpa
+                SELECT student_id, name, email, phone, department, year, roll_number, sgpa, lab_batch
                 FROM students 
                 ORDER BY student_id
             """)
@@ -132,7 +133,7 @@ class StudentService:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             cursor.execute("""
-                SELECT student_id, name, email, phone, department, year, roll_number, sgpa
+                SELECT student_id, name, email, phone, department, year, roll_number, sgpa, lab_batch
                 FROM students 
                 WHERE student_id = %s
             """, (student_id,))

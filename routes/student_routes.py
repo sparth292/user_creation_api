@@ -31,7 +31,9 @@ def create_student():
         "department": "string",
         "year": "integer",
         "roll_number": "string",
-        "sgpa": "float"
+        "sgpa": "float",
+        "lab_batch": "string" (optional, values: C1, C2, C3)
+        
     }
     """
     try:
@@ -96,6 +98,15 @@ def create_student():
                 return jsonify({
                     "success": False,
                     "message": "SGPA must be a valid number"
+                }), 400
+        
+        # Validate lab_batch if provided
+        if 'lab_batch' in student_data and student_data['lab_batch'] is not None:
+            valid_lab_batches = ['C1', 'C2', 'C3']
+            if student_data['lab_batch'] not in valid_lab_batches:
+                return jsonify({
+                    "success": False,
+                    "message": f"lab_batch must be one of: {', '.join(valid_lab_batches)}"
                 }), 400
         
         # Create student using service
